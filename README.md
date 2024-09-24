@@ -35,6 +35,76 @@
   2. pypi_url이 존재하지 않는 패키지가 포함된 repo_url 식별
   3. malware 리스트에 포함된 패키지가 `git_package_list.json`에도 포함된 경우 식별
   4. malware 리스트에 포함되어 있고 `results.json`에도 같은 패키지가 있는 경우 식별
+     
+#### git_pkg.py 결과 예시
+
+```json
+{
+    "https://github.com/example/project1": [
+        {
+            "name": "example_package1",
+            "pypi_url": "https://pypi.org/project/example_package1/",
+            "score": 10,
+            "score_breakdown": "typos: [3.80] + typos bonus(>3.5): [+0.3] + yara: [+1] + compare: [+2] + git_url mismatch: [+0.5] + pkg_count(1): [+1.00]",
+            "danger": "malware",
+            "result": {
+                "message": "original_package1의 타이포스쿼팅 패키지 의심.",
+                "dog_results": [],
+                "sbom_ids": []
+            }
+        }
+    ],
+    "https://github.com/example/project2": [
+        {
+            "name": "example_package2",
+            "score": 10,
+            "danger": "malware"
+        }
+    ],
+    "https://github.com/example/project3": [
+        {
+            "name": "example_package3",
+            "pypi_url": "https://pypi.org/project/example_package3/",
+            "score": 6.357304642675964,
+            "score_breakdown": "typos: [3.36] + compare: [+2] + sbom: [+2] + git_url match: [-1]",
+            "danger": "CRIT",
+            "result": {
+                "message": "original_package3의 타이포스쿼팅 패키지 의심.",
+                "dog_results": [],
+                "sbom_ids": [
+                    "CVE-2023-XXXXX",
+                    "CVE-2022-XXXXX",
+                    "CVE-2024-XXXXX",
+                    "..."
+                ]
+            }
+        }
+    ],
+    "https://github.com/example/project4": [
+        {
+            "name": "example_package4",
+            "pypi_url": "no pypi url",
+            "score": 4.511665283481557,
+            "score_breakdown": "typos: [3.71] + typos bonus(>3.5): [+0.3] + no git_url: [+0.5]",
+            "danger": "NOTICE - 삭제 혹은 오타 패키지 존재",
+            "result": {
+                "message": "original_package4의 타이포스쿼팅 패키지 의심.",
+                "dog_results": [],
+                "sbom_ids": []
+            }
+        }
+    ]
+}
+```
+
+이 예시는 다음 네 가지 경우를 보여줍니다:
+
+1. **Malware 리스트에 포함되어 있고 `results.json`에도 같은 패키지가 있는 경우**: `example_package1`
+2. **Malware 리스트에 포함된 패키지가 `git_package_list.json`에 포함된 경우**: `example_package2`
+3. **`results.json`에서 score가 6.0 이상인 패키지가 포함된 repo_url**: `example_package3`
+4. **pypi_url이 존재하지 않는 패키지가 포함된 repo_url**: `example_package4`
+
+각 경우에 대해 위험도(danger), 점수(score), 그리고 관련 정보가 제공됩니다.
 
 ### 5. output.py
 - TypoGuardian에서 pypi_url이 없을 경우 발생하는 에러를 해결하기 위한 코드
