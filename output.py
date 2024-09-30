@@ -56,11 +56,11 @@ def calculate_score(typo_name, typo_score, dog_result, yara_scan_result, compari
     if github_info:
         github_url, github_name = github_info
         if github_url:
-            github_name_normalized = github_name.lower().replace('_', '-') if github_name else ""
+            github_name_normalized = github_name.lower().replace('_', '-').replace('.', '-') if github_name else ""
             typo_name_normalized = typo_name.lower().replace('_', '-')
-            package_github_url_normalized = package_github_url.lower().replace('_', '-') if package_github_url else None
+            package_github_url_normalized = package_github_url.lower() if package_github_url else None
 
-            if package_github_url_normalized and github_url.lower() == package_github_url_normalized:
+            if github_url.lower() == package_github_url_normalized:
                 score += 2
                 score_breakdown.append("git_url steal: [+2]")
             elif github_name_normalized == typo_name_normalized:
